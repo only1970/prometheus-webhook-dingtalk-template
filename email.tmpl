@@ -1,0 +1,25 @@
+{{ define "default.html" }}
+{{- if gt (len .Alerts.Firing) 0 -}}
+[{{ .Status | toUpper }}:{{ .Alerts.Firing | len }}]
+{{ range $i, $alert := .Alerts }}
+<pre>
+告警节点：{{ index $alert.Labels "instance" }}
+告警服务：{{ index $alert.Labels "alertname" }}
+报警详情：{{ index $alert.Annotations "summary" }}
+开始时间：{{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
+</pre>
+{{ end }}
+{{ end }}
+{{- if gt (len .Alerts.Resolved) 0 -}}
+[{{ .Status | toUpper }}:{{ .Alerts.Resolved | len }}]
+{{ range $i, $alert := .Alerts }}
+<pre>
+恢复节点：{{ index $alert.Labels "instance" }}
+恢复服务：{{ index $alert.Labels "alertname" }}
+状    态：{{ index $alert.Status }}
+开始时间：{{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05"}}
+恢复时间：{{ ($alert.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
+</pre>
+{{ end }}
+{{ end }}
+{{- end }}
