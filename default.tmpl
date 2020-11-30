@@ -71,7 +71,7 @@
 {{ end }}
 
 {{ define "ding.link.title" }}{{ template "__subject" . }}{{ end }}
-{{ define "ding.link.content" }}#### \[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] **[{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+{{ define "ding.link.content" }}#### **\[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] [{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
 {{ template "__text_separate" . }}
 {{ template "__text_alert_list" . }}
 {{ end }}
