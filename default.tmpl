@@ -1,6 +1,30 @@
-{{ define "__subject" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ else }}RESOLVED{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }} {{ if gt (len .CommonLabels) (len .GroupLabels) }}({{ with .CommonLabels.Remove .GroupLabels.Names }}{{ .Values | join " " }}{{ end }}){{ end }}{{ end }}
+{{ define "__subject" }}
+[
+{{ .Status | toUpper }}
+{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}
+{{ else }}
+{{ .Status | toUpper }}
+{{ end }}
+] 
+
+{{ .GroupLabels.SortedPairs.Values | join " " }} 
+
+{{ if gt (len .CommonLabels) (len .GroupLabels) }}
+(
+{{ with .CommonLabels.Remove .GroupLabels.Names }}
+{{ .Values | join " " }}
+{{ end }}
+)
+
+{{ end }}
+
+{{ end }}
 
 {{ define "__alertmanagerURL" }}{{ .ExternalURL }}/#/alerts?receiver={{ .Receiver }}{{ end }}
+
+{{ define "__text_separate" }}
+- - -
+{{ end }}
 
 {{ define "__text_alert_list" }}
 
@@ -9,19 +33,19 @@
 {{ range .Alerts.Firing }}
 
 {{ range .Labels.SortedPairs }}
-{{ if eq .Name "instance" }}告警节点：{{ .Value|markdown|html }}{{ end }}
-{{ if eq .Name "alertname" }}告警名称： {{ .Value|markdown|html }}{{ end }}
-{{ if eq .Name "severity" }}告警级别：{{ .Value|markdown|html }}{{ end }}
+{{ if eq .Name "instance" }}**告警节点：**{{ .Value|markdown|html }}{{ end }}
+{{ if eq .Name "alertname" }}**告警名称：**{{ .Value|markdown|html }}{{ end }}
+{{ if eq .Name "severity" }}**告警级别：**{{ .Value|markdown|html }}{{ end }}
 {{ end }}
 
-{{ if .Status }}状态：{{ printf "%s\n" .Status }}{{ end }}
-{{ if .StartsAt }}触发时间：{{ printf "%s\n" ((.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05") }}{{ end }}
+{{ if .Status }}**状态：**{{ printf "%s\n" .Status }}{{ end }}
+{{ if .StartsAt }}**触发时间：**{{ printf "%s\n" ((.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05") }}{{ end }}
 
 {{ range .Annotations.SortedPairs }}
-{{ if eq .Name "description" }}告警详情：{{ .Value|markdown|html }}{{ end }}
+{{ if eq .Name "description" }}**告警详情：**{{ .Value|markdown|html }}{{ end }}
 {{ end }}
 
-{{ printf "\n" }}
+- - -
 
 {{ end }}
 
@@ -30,15 +54,15 @@
 {{ range .Alerts.Resolved }}
 
 {{ range .Labels.SortedPairs }}
-{{ if eq .Name "instance" }}告警节点：{{ .Value|markdown|html }}{{ end }}
-{{ if eq .Name "alertname" }}告警名称：{{ .Value|markdown|html }}{{ end }}
+{{ if eq .Name "instance" }}**告警节点：**{{ .Value|markdown|html }}{{ end }}
+{{ if eq .Name "alertname" }}**告警名称：**{{ .Value|markdown|html }}{{ end }}
 {{ end }}
 
-{{ if .Status }}状态：{{ printf "%s\n" .Status }}{{ end }}
-{{ if .StartsAt }}触发时间：{{ printf "%s\n" ((.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05") }}{{ end }}
-{{ if .EndsAt }}恢复时间：{{ printf "%s\n" ((.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05") }}{{ end }}
+{{ if .Status }}**状态：**{{ printf "%s\n" .Status }}{{ end }}
+{{ if .StartsAt }}**触发时间：**{{ printf "%s\n" ((.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05") }}{{ end }}
+{{ if .EndsAt }}**恢复时间：**{{ printf "%s\n" ((.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05") }}{{ end }}
 
-{{ printf "\n" }}
+- - -
 
 {{ end }}
 
@@ -48,5 +72,6 @@
 
 {{ define "ding.link.title" }}{{ template "__subject" . }}{{ end }}
 {{ define "ding.link.content" }}#### \[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] **[{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+{{ template "__text_separate" . }}
 {{ template "__text_alert_list" . }}
 {{ end }}
